@@ -1,0 +1,14 @@
+services:
+  nuget-proxy:
+    build: .
+    ports:
+      - "5000:8080"
+    environment:
+      - NuGetProxy__BaseUrl=${NUGET_PROXY_BASE_URL:-http://localhost:5000}
+      - NuGetProxy__GitLab__Url=${GITLAB_URL}
+      - NuGetProxy__GitLab__ServiceToken=${GITLAB_SERVICE_TOKEN}
+      - NuGetProxy__GitLab__RefreshIntervalSeconds=${GITLAB_REFRESH_INTERVAL:-300}
+      - NuGetProxy__UpstreamFeeds__0__Name=nuget.org
+      - NuGetProxy__UpstreamFeeds__0__ServiceIndexUrl=https://api.nuget.org/v3/index.json
+      - NuGetProxy__UpstreamFeeds__0__ForwardAuth=false
+    restart: unless-stopped
