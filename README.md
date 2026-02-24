@@ -202,7 +202,8 @@ Set these in your GitHub repo under **Settings > Secrets and variables > Actions
 | Secret | Description |
 |---|---|
 | `DOCKERHUB_USERNAME` | Docker Hub username (`robsonfelix`) |
-| `DOCKERHUB_TOKEN` | Docker Hub [access token](https://hub.docker.com/settings/security) |
+| `DOCKERHUB_TOKEN` | Docker Hub [access token](https://hub.docker.com/settings/security) (for image push) |
+| `DOCKERHUB_PASSWORD` | Docker Hub account password (for README sync — PATs don't work with the description API) |
 
 ## Built with
 
