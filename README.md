@@ -1,5 +1,9 @@
 # NuGet Proxy
 
+[![Build and Publish](https://github.com/robsonfelix/nuget-proxy/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/robsonfelix/nuget-proxy/actions/workflows/docker-publish.yml)
+[![Docker Image](https://img.shields.io/docker/v/robsonfelix/nuget-proxy?sort=semver&label=Docker%20Hub)](https://hub.docker.com/r/robsonfelix/nuget-proxy)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 A lightweight, read-only NuGet V3 proxy that unifies a self-hosted GitLab package registry and one or more upstream NuGet feeds behind a single source URL. Point `dotnet restore` at the proxy, and it transparently routes each package to the right place.
 
 ## How it works
@@ -31,7 +35,19 @@ When a request arrives:
 
 ## Quick start
 
-### Docker Compose (recommended)
+### Docker Hub (easiest)
+
+```bash
+docker run -d -p 5000:8080 \
+  -e NuGetProxy__BaseUrl=http://localhost:5000 \
+  -e NuGetProxy__GitLab__Url=https://gitlab.example.com \
+  -e NuGetProxy__GitLab__ServiceToken=glpat-xxxxxxxxxxxxxxxxxxxx \
+  robsonfelix/nuget-proxy
+```
+
+The proxy is now available at `http://localhost:5000/v3/index.json`.
+
+### Docker Compose
 
 Create a `.env` file next to `docker-compose.yml`:
 
@@ -46,9 +62,7 @@ Then:
 docker compose up -d
 ```
 
-The proxy is now available at `http://localhost:5000/v3/index.json`.
-
-### Standalone
+### Build from source
 
 ```bash
 cd src/NuGetProxy
@@ -145,6 +159,50 @@ src/NuGetProxy/
 
 tests/NuGetProxy.Tests/               xunit v3 integration tests
 ```
+
+## Docker image tags
+
+Images are published to [Docker Hub](https://hub.docker.com/r/robsonfelix/nuget-proxy) automatically via GitHub Actions.
+
+| Tag | Description |
+|---|---|
+| `latest` | Latest build from `master` |
+| `1.0.0` | Exact release version |
+| `1.0` | Latest patch in the 1.0.x line |
+| `1` | Latest minor/patch in the 1.x line |
+| `a1b2c3d` | Specific commit (short SHA) |
+
+### Creating a release
+
+Tag a commit and push:
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+This triggers the CI pipeline to:
+
+1. Build the Docker image
+2. Push it to Docker Hub with all matching tags (`1.0.0`, `1.0`, `1`, `latest`)
+3. Create a GitHub Release with auto-generated release notes
+
+## CI/CD
+
+The GitHub Actions workflow (`.github/workflows/docker-publish.yml`) runs on:
+
+- **Push to `master`** -- builds and pushes `latest` + commit SHA tag
+- **Version tags (`v*`)** -- builds and pushes semver tags + creates a GitHub Release
+- **Pull requests** -- builds only (no push), to validate the Dockerfile
+
+### Required secrets
+
+Set these in your GitHub repo under **Settings > Secrets and variables > Actions**:
+
+| Secret | Description |
+|---|---|
+| `DOCKERHUB_USERNAME` | Docker Hub username (`robsonfelix`) |
+| `DOCKERHUB_TOKEN` | Docker Hub [access token](https://hub.docker.com/settings/security) |
 
 ## Built with
 
